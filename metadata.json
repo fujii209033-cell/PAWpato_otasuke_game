@@ -1,0 +1,6 @@
+{
+  "name": "マーシャルのしょうかゲーム",
+  "description": "パウ・パトロールのマーシャルと一緒に消防車で火を消す、子供向けのかんたんで楽しい消火ゲームです。リアルタイムの進捗、音声ガイダンス、難易度設定、成功時のハッピーなメロディ演出を備えています。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
