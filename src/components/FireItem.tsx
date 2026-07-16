@@ -834,6 +834,28 @@ export default function FireItem({ id, x, y, size, maxSize, type, name, isTarget
                     transition={{ repeat: Infinity, duration: 1.2 }}
                   />
                 </div>
+              ) : characterId === 'rubble' ? (
+                /* Debris pile and barricade animation for Rubble Mode */
+                <div className="relative w-14 h-14 flex items-center justify-center">
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.1, 0.95, 1.05, 1],
+                      rotate: [-2, 2, -1, 1, -2]
+                    }}
+                    transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+                    className="w-12 h-12 bg-gradient-to-br from-amber-500 to-yellow-600 border-2 border-slate-800 rounded-lg shadow-[0_0_12px_rgba(217,119,6,0.6)] flex flex-col items-center justify-center select-none p-1"
+                  >
+                    <div className="text-[8px] font-black text-white leading-none mb-1 text-center bg-slate-900/40 px-1 rounded">がれき</div>
+                    <span className="text-base">🪨🚧</span>
+                  </motion.div>
+                  <motion.div
+                    className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full border border-slate-950 flex items-center justify-center font-bold text-[8px] text-slate-950"
+                    animate={{ scale: [0.8, 1.2, 0.8] }}
+                    transition={{ repeat: Infinity, duration: 1.0 }}
+                  >
+                    ⚠️
+                  </motion.div>
+                </div>
               ) : (
                 /* Flame animation for Marshall Mode */
                 <div className="relative w-14 h-14">
@@ -909,7 +931,7 @@ export default function FireItem({ id, x, y, size, maxSize, type, name, isTarget
         <div className="flex flex-col gap-1 mt-1 bg-slate-900/80 p-1.5 rounded-lg border border-slate-700/50 shadow">
           {/* Fire size (Flame) / Rescue progress */}
           <div className="text-[9px] text-white flex items-center gap-1 font-bold font-sans">
-            {isChase ? (
+            {characterId === 'chase' ? (
               <>
                 <HelpCircle size={10} className="text-yellow-400 animate-pulse" />
                 <div className="w-12 bg-slate-700 h-1.5 rounded-full overflow-hidden">
@@ -919,6 +941,28 @@ export default function FireItem({ id, x, y, size, maxSize, type, name, isTarget
                   />
                 </div>
                 <span className="text-[8px] text-yellow-200 font-mono w-6 text-right">{Math.ceil(size)}%</span>
+              </>
+            ) : characterId === 'skye' ? (
+              <>
+                <Heart size={10} className="text-pink-400 animate-pulse fill-pink-400" />
+                <div className="w-12 bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                  <div 
+                    style={{ width: `${size}%` }} 
+                    className="h-full transition-all duration-100 bg-pink-400"
+                  />
+                </div>
+                <span className="text-[8px] text-pink-200 font-mono w-6 text-right">{Math.ceil(size)}%</span>
+              </>
+            ) : characterId === 'rubble' ? (
+              <>
+                <AlertCircle size={10} className="text-amber-400 animate-pulse" />
+                <div className="w-12 bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                  <div 
+                    style={{ width: `${size}%` }} 
+                    className="h-full transition-all duration-100 bg-amber-500"
+                  />
+                </div>
+                <span className="text-[8px] text-amber-200 font-mono w-6 text-right">{Math.ceil(size)}%</span>
               </>
             ) : (
               <>
@@ -936,7 +980,7 @@ export default function FireItem({ id, x, y, size, maxSize, type, name, isTarget
           
           {/* Building Durability (Heart HP) / Citizen Energy */}
           <div className="text-[9px] text-white flex items-center gap-1 font-bold font-sans">
-            {isChase ? (
+            {characterId === 'chase' ? (
               <>
                 <Smile size={10} className="text-indigo-400 animate-pulse" />
                 <div className="w-12 bg-slate-700 h-1.5 rounded-full overflow-hidden">
@@ -946,6 +990,28 @@ export default function FireItem({ id, x, y, size, maxSize, type, name, isTarget
                   />
                 </div>
                 <span className="text-[8px] text-indigo-200 font-mono w-6 text-right">{Math.max(0, Math.ceil(hp))}</span>
+              </>
+            ) : characterId === 'skye' ? (
+              <>
+                <Smile size={10} className="text-emerald-400 animate-pulse" />
+                <div className="w-12 bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                  <div 
+                    style={{ width: `${(hp / maxHp) * 100}%` }} 
+                    className="h-full bg-emerald-400 transition-all duration-100"
+                  />
+                </div>
+                <span className="text-[8px] text-emerald-200 font-mono w-6 text-right">{Math.max(0, Math.ceil(hp))}</span>
+              </>
+            ) : characterId === 'rubble' ? (
+              <>
+                <Smile size={10} className="text-yellow-400 animate-pulse" />
+                <div className="w-12 bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                  <div 
+                    style={{ width: `${(hp / maxHp) * 100}%` }} 
+                    className="h-full bg-yellow-500 transition-all duration-100"
+                  />
+                </div>
+                <span className="text-[8px] text-yellow-200 font-mono w-6 text-right">{Math.max(0, Math.ceil(hp))}</span>
               </>
             ) : (
               <>
@@ -970,7 +1036,15 @@ export default function FireItem({ id, x, y, size, maxSize, type, name, isTarget
           animate={{ scale: 1 }}
           className="mt-1 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow border border-green-300 flex items-center gap-0.5"
         >
-          <span>{isChase ? 'たすかったよ!' : 'あんぜん!'}</span>
+          <span>
+            {characterId === 'chase'
+              ? 'おたすけ完了! 🚨'
+              : characterId === 'skye'
+              ? 'きゅうじょ完了! 🚁'
+              : characterId === 'rubble'
+              ? 'かたづけ完了! 🚧'
+              : 'あんぜん! 🚒'}
+          </span>
         </motion.div>
       )}
 

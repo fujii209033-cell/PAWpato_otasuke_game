@@ -11,6 +11,9 @@ import WaterSprayCanvas from './WaterSprayCanvas';
 import { Citizen } from './Citizen';
 import SkyeRescueHoist from './SkyeRescueHoist';
 import RubbleDebrisClearPanel from './RubbleDebrisClearPanel';
+import MarshallFireFightPanel from './MarshallFireFightPanel';
+import ChaseTrafficControlPanel from './ChaseTrafficControlPanel';
+import SkyeRescuePanel from './SkyeRescuePanel';
 
 // Cute interactive citizens with coordinate mappings (on the sidewalk/above road level)
 const CITIZEN_DATA = [
@@ -344,7 +347,7 @@ const CHARACTERS: CharacterConfig[] = [
     id: 'rubble',
     name: 'ラブル',
     roleName: 'こうじのくるま',
-    avatar: '/src/assets/images/rubble_face_only_1784146542431.jpg',
+    avatar: '/src/assets/images/rubble_face_new_1784157012744.jpg',
     emoji: '🚧💛',
     colorClass: 'bg-amber-400 border-amber-500 hover:bg-amber-500 text-slate-900',
     accentColor: 'text-amber-600 border-amber-400',
@@ -359,7 +362,7 @@ const renderCharacterFace = (id: CharacterId, sizeClass: string = "w-10 h-10") =
     : id === 'chase' 
     ? "/src/assets/images/chase_face_only_1784068369473.jpg" 
     : id === 'rubble'
-    ? "/src/assets/images/rubble_face_only_1784146542431.jpg"
+    ? "/src/assets/images/rubble_face_new_1784157012744.jpg"
     : "/src/assets/images/marshall_face_only_1784061084168.jpg";
 
   return (
@@ -545,6 +548,9 @@ export default function GameArea() {
   const [targetFireId, setTargetFireId] = useState<string | null>(null);
   const [selectedCharacter, setSelectedCharacter] = useState<CharacterId>('marshall');
   const [activeRubbleTarget, setActiveRubbleTarget] = useState<Fire | null>(null);
+  const [activeMarshallTarget, setActiveMarshallTarget] = useState<Fire | null>(null);
+  const [activeChaseTarget, setActiveChaseTarget] = useState<Fire | null>(null);
+  const [activeSkyeTarget, setActiveSkyeTarget] = useState<Fire | null>(null);
   
   // Audio & Speech state variables
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -988,6 +994,12 @@ export default function GameArea() {
 
     if (selectedCharacter === 'rubble') {
       setActiveRubbleTarget(fire);
+    } else if (selectedCharacter === 'marshall') {
+      setActiveMarshallTarget(fire);
+    } else if (selectedCharacter === 'chase') {
+      setActiveChaseTarget(fire);
+    } else if (selectedCharacter === 'skye') {
+      setActiveSkyeTarget(fire);
     }
   };
 
@@ -1021,6 +1033,150 @@ export default function GameArea() {
       setSpecialGauge((prev) => Math.min(100, prev + 34));
       setTargetFireId(null);
       setActiveRubbleTarget(null);
+    }, 0);
+
+    if (difficulty === 'endless') {
+      setTimeout(() => {
+        setFires((prev) => prev.filter((f) => f.id !== fireId));
+      }, 1500);
+
+      setTimeout(() => {
+        if (gameStateRef.current === 'playing') {
+          setFires((prev) => {
+            const newFire = generateSingleEndlessFire(prev, selectedStage, extinguishedCountRef.current + 1, selectedCharacter);
+            return [...prev, newFire];
+          });
+        }
+      }, 4000);
+    }
+  };
+
+  const handleMarshallTargetCleared = (fireId: string) => {
+    setFires((prev) =>
+      prev.map((f) => {
+        if (f.id === fireId) {
+          sound.playExtinguish();
+
+          const praises = [
+            'すごい！火がきれいに消えたよ！🌟',
+            'さすがマーシャル！おみず大せいこう！🚒',
+            'これで安心だね！ありがとう！🐶'
+          ];
+          const subPraises = [
+            'すごい！火がきれいに消えたよ！🌟💦',
+            'さすがマーシャル！おみず大せいこう！🚒🔥',
+            'これで安心だね！ありがとう！🐾'
+          ];
+          const idx = Math.floor(Math.random() * praises.length);
+          triggerGuidance(praises[idx], subPraises[idx]);
+
+          return { ...f, size: 0, hp: f.maxHp };
+        }
+        return f;
+      })
+    );
+
+    setTimeout(() => {
+      setStats((s) => ({ ...s, extinguishedFires: s.extinguishedFires + 1 }));
+      setSpecialGauge((prev) => Math.min(100, prev + 34));
+      setTargetFireId(null);
+      setActiveMarshallTarget(null);
+    }, 0);
+
+    if (difficulty === 'endless') {
+      setTimeout(() => {
+        setFires((prev) => prev.filter((f) => f.id !== fireId));
+      }, 1500);
+
+      setTimeout(() => {
+        if (gameStateRef.current === 'playing') {
+          setFires((prev) => {
+            const newFire = generateSingleEndlessFire(prev, selectedStage, extinguishedCountRef.current + 1, selectedCharacter);
+            return [...prev, newFire];
+          });
+        }
+      }, 4000);
+    }
+  };
+
+  const handleChaseTargetCleared = (fireId: string) => {
+    setFires((prev) =>
+      prev.map((f) => {
+        if (f.id === fireId) {
+          sound.playExtinguish();
+
+          const praises = [
+            'すごい！あんぜんコーンをじょうずに置けたよ！🌟',
+            'さすがチェイス！かっこよく解決したよ！🚔',
+            'みんなが笑顔になったよ！ありがとう！🐶'
+          ];
+          const subPraises = [
+            'すごい！あんぜんコーンをじょうずに置けたよ！🌟🚨',
+            'さすがチェイス！かっこよく解決したよ！🚔💙',
+            'みんなが笑顔になったよ！ありがとう！🐾'
+          ];
+          const idx = Math.floor(Math.random() * praises.length);
+          triggerGuidance(praises[idx], subPraises[idx]);
+
+          return { ...f, size: 0, hp: f.maxHp };
+        }
+        return f;
+      })
+    );
+
+    setTimeout(() => {
+      setStats((s) => ({ ...s, extinguishedFires: s.extinguishedFires + 1 }));
+      setSpecialGauge((prev) => Math.min(100, prev + 34));
+      setTargetFireId(null);
+      setActiveChaseTarget(null);
+    }, 0);
+
+    if (difficulty === 'endless') {
+      setTimeout(() => {
+        setFires((prev) => prev.filter((f) => f.id !== fireId));
+      }, 1500);
+
+      setTimeout(() => {
+        if (gameStateRef.current === 'playing') {
+          setFires((prev) => {
+            const newFire = generateSingleEndlessFire(prev, selectedStage, extinguishedCountRef.current + 1, selectedCharacter);
+            return [...prev, newFire];
+          });
+        }
+      }, 4000);
+    }
+  };
+
+  const handleSkyeTargetCleared = (fireId: string) => {
+    setFires((prev) =>
+      prev.map((f) => {
+        if (f.id === fireId) {
+          sound.playExtinguish();
+
+          const praises = [
+            'すごい！おともだちをきゅうじょできたよ！🌟',
+            'さすがスカイ！おおぞら大かつやく！🚁',
+            'みんな助かってよかったね！ありがとう！🐶'
+          ];
+          const subPraises = [
+            'すごい！おともだちをきゅうじょできたよ！🌟💖',
+            'さすがスカイ！おおぞら大かつやく！🚁✨',
+            'みんな助かってよかったね！ありがとう！🐾'
+          ];
+          const idx = Math.floor(Math.random() * praises.length);
+          triggerGuidance(praises[idx], subPraises[idx]);
+
+          return { ...f, size: 0, hp: f.maxHp };
+        }
+        return f;
+      })
+    );
+
+    setTimeout(() => {
+      setStats((s) => ({ ...s, extinguishedFires: s.extinguishedFires + 1 }));
+      setSpecialGauge((prev) => Math.min(100, prev + 34));
+      setTargetFireId(null);
+      setActiveSkyeTarget(null);
     }, 0);
 
     if (difficulty === 'endless') {
@@ -1436,9 +1592,13 @@ export default function GameArea() {
         <div className="grid grid-cols-12 gap-1 font-black bg-slate-100 p-1 sm:p-1.5 rounded-t-lg border-b border-slate-300 text-center text-slate-600">
           <div className="col-span-2">順位</div>
           <div className="col-span-3">ステージ</div>
-          <div className="col-span-2">消した数</div>
+          <div className="col-span-2">
+            {selectedCharacter === 'chase' ? 'たすけた数' : selectedCharacter === 'skye' ? 'きゅうじょ数' : selectedCharacter === 'rubble' ? 'かたづけ数' : '消した数'}
+          </div>
           <div className="col-span-2">時間</div>
-          <div className="col-span-3">お水</div>
+          <div className="col-span-3">
+            {selectedCharacter === 'chase' ? 'パワー' : selectedCharacter === 'skye' ? 'エネルギー' : selectedCharacter === 'rubble' ? 'パワー' : 'お水'}
+          </div>
         </div>
         <div className="divide-y divide-slate-100 max-h-[120px] sm:max-h-[150px] overflow-y-auto scrollbar-thin">
           {ranking.slice(0, limit).map((entry: any, index: number) => {
@@ -1931,7 +2091,13 @@ export default function GameArea() {
                   🎉 にんむかんりょう！ 🎉
                 </h2>
                 <p className="text-xs sm:text-base font-black mb-2 sm:mb-4 font-sans text-white flex-shrink-0">
-                  マーシャルといっしょに、街の平和（へいわ）をまもったよ！
+                  {selectedCharacter === 'chase' 
+                    ? 'チェイスといっしょに、街の平和（へいわ）をまもったよ！🚔🌟' 
+                    : selectedCharacter === 'skye' 
+                    ? 'スカイといっしょに、街の平和（へいわ）をまもったよ！🚁💖' 
+                    : selectedCharacter === 'rubble' 
+                    ? 'ラブルといっしょに、街のがれきをきれいにかたづけたよ！🚧🚜' 
+                    : 'マーシャルといっしょに、街の平和（へいわ）をまもったよ！🚒🔥'}
                 </p>
 
                 {/* Performance stats box */}
@@ -1946,7 +2112,7 @@ export default function GameArea() {
                       <span className="text-orange-500 font-black">{DIFFICULTY_LABELS[difficulty].title}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>消した火の数:</span>
+                      <span>{selectedCharacter === 'chase' ? 'たすけたおともだち:' : selectedCharacter === 'skye' ? 'きゅうじょした数:' : selectedCharacter === 'rubble' ? 'かたづけたがれき:' : '消した火の数:'}</span>
                       <span className="text-red-500 font-black">{currentExtinguished}こ / {totalFireCount}こ</span>
                     </div>
                     <div className="flex justify-between">
@@ -1955,8 +2121,10 @@ export default function GameArea() {
                     </div>
                     {difficulty === 'hard' && (
                       <div className="flex justify-between">
-                        <span>使ったお水の量:</span>
-                        <span className="text-blue-500 font-black">{stats.waterUsed}リットル</span>
+                        <span>{selectedCharacter === 'chase' ? 'つかったパワー:' : selectedCharacter === 'skye' ? 'つかったエネルギー:' : selectedCharacter === 'rubble' ? 'つかったパワー:' : 'つかったお水の量:'}</span>
+                        <span className="text-blue-500 font-black">
+                          {stats.waterUsed}{selectedCharacter === 'chase' || selectedCharacter === 'skye' || selectedCharacter === 'rubble' ? '' : 'リットル'}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -2005,10 +2173,17 @@ export default function GameArea() {
                 </motion.div>
 
                 <h2 className="text-xl sm:text-3xl md:text-4xl font-black mb-0.5 sm:mb-1 font-sans text-yellow-300 tracking-wider drop-shadow flex-shrink-0">
-                  🔥 おしい！がんばったね！ 🔥
+                  {selectedCharacter === 'chase' ? '🚔 おしい！がんばったね！ 🚔' : selectedCharacter === 'skye' ? '💖 おしい！がんばったね！ 💖' : selectedCharacter === 'rubble' ? '🪨 おしい！がんばったね！ 🚧' : '🔥 おしい！がんばったね！ 🔥'}
                 </h2>
                 <p className="text-xs sm:text-sm font-bold mb-2 sm:mb-4 font-sans text-white max-w-md flex-shrink-0">
-                  たいへん！<span className="text-yellow-200 font-black">{destroyedBuildingName}</span>がもえちゃったよ。
+                  {selectedCharacter === 'rubble' ? (
+                    <>たいへん！<span className="text-yellow-200 font-black">{destroyedBuildingName}</span>ががれきでうもれちゃったよ。🚧</>
+                  ) : selectedCharacter === 'chase' || selectedCharacter === 'skye' ? (
+                    <>たいへん！がんばったけどおともだちがたすけられなかったよ。💦</>
+                  ) : (
+                    <>たいへん！<span className="text-yellow-200 font-black">{destroyedBuildingName}</span>がもえちゃったよ。🔥</>
+                  )}
+                  <br />
                   でも、パウ・パトロールはあきらめない！もう一回やってみよう！
                 </p>
 
@@ -2024,7 +2199,7 @@ export default function GameArea() {
                       <span className="text-orange-500 font-black">{DIFFICULTY_LABELS[difficulty].title}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>消した火の数:</span>
+                      <span>{selectedCharacter === 'chase' ? 'たすけたおともだち:' : selectedCharacter === 'skye' ? 'きゅうじょした数:' : selectedCharacter === 'rubble' ? 'かたづけたがれき:' : '消した火の数:'}</span>
                       <span className="text-red-500 font-black">
                         {difficulty === 'endless' ? `${stats.extinguishedFires}こ` : `${currentExtinguished}こ / ${totalFireCount}こ`}
                       </span>
@@ -2035,8 +2210,10 @@ export default function GameArea() {
                     </div>
                     {(difficulty === 'hard' || difficulty === 'endless') && (
                       <div className="flex justify-between">
-                        <span>使ったお水の量:</span>
-                        <span className="text-blue-500 font-black">{stats.waterUsed}リットル</span>
+                        <span>{selectedCharacter === 'chase' ? 'つかったパワー:' : selectedCharacter === 'skye' ? 'つかったエネルギー:' : selectedCharacter === 'rubble' ? 'つかったパワー:' : 'つかったお水の量:'}</span>
+                        <span className="text-blue-500 font-black">
+                          {stats.waterUsed}{selectedCharacter === 'chase' || selectedCharacter === 'skye' || selectedCharacter === 'rubble' ? '' : 'リットル'}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -2078,22 +2255,6 @@ export default function GameArea() {
           {gameState === 'playing' && (
             <div id="active-playing-viewport" className="absolute inset-0 w-full h-full">
               
-              {/* Rubble Debris Clear interactive overlay panel */}
-              <AnimatePresence>
-                {selectedCharacter === 'rubble' && activeRubbleTarget && (
-                  <RubbleDebrisClearPanel
-                    target={activeRubbleTarget}
-                    soundEnabled={soundEnabled}
-                    onComplete={() => handleRubbleTargetCleared(activeRubbleTarget.id)}
-                    onClose={() => {
-                      sound.playClick();
-                      setActiveRubbleTarget(null);
-                      setTargetFireId(null);
-                    }}
-                  />
-                )}
-              </AnimatePresence>
-
               {/* Fire Entities rendering (tappable items) */}
               {fires.map((fire) => (
                 <FireItem
@@ -2435,15 +2596,27 @@ export default function GameArea() {
         <div id="bottom-playing-progress-tracker" className="relative z-10 flex-shrink-0 bg-amber-50 border-t-4 border-amber-300 px-4 py-2 sm:py-3.5 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 shadow-md select-none font-sans">
           {/* Left: Remaining Fire count */}
           <div className="flex items-center gap-2">
-            <div className={`rounded-full p-1 shadow-sm border border-white animate-bounce ${selectedCharacter === 'chase' ? 'bg-blue-500' : 'bg-red-500'}`}>
+            <div className={`rounded-full p-1 shadow-sm border border-white animate-bounce ${
+              selectedCharacter === 'chase' ? 'bg-blue-500' : selectedCharacter === 'skye' ? 'bg-pink-500' : selectedCharacter === 'rubble' ? 'bg-yellow-500 text-slate-900' : 'bg-red-500'
+            }`}>
               {selectedCharacter === 'chase' ? (
                 <HelpCircle size={14} className="text-white fill-yellow-300 animate-pulse" />
+              ) : selectedCharacter === 'skye' ? (
+                <Heart size={14} className="text-white fill-pink-200 animate-pulse" />
+              ) : selectedCharacter === 'rubble' ? (
+                <Wrench size={14} className="text-slate-900 fill-amber-300 animate-pulse" />
               ) : (
                 <Flame size={14} className="text-white fill-white animate-pulse" />
               )}
             </div>
             <span className="text-xs sm:text-sm font-black text-slate-800">
-              {selectedCharacter === 'chase' ? 'おたすけを まつ人（ともだち）:' : 'のこりの火事（かじ）:'} <span className="text-red-600 text-sm sm:text-base font-black underline decoration-red-400 decoration-wavy">{totalFireCount - currentExtinguished}{selectedCharacter === 'chase' ? 'にん' : 'こ'}</span> / {totalFireCount}{selectedCharacter === 'chase' ? 'にん' : 'こ'}
+              {selectedCharacter === 'chase' 
+                ? 'おたすけを まつ人（ともだち）:' 
+                : selectedCharacter === 'skye'
+                ? 'きゅうじょを まつ人:'
+                : selectedCharacter === 'rubble'
+                ? 'のこりのがれき:' 
+                : 'のこりの火事（かじ）:'} <span className="text-red-600 text-sm sm:text-base font-black underline decoration-red-400 decoration-wavy">{totalFireCount - currentExtinguished}{selectedCharacter === 'chase' ? 'にん' : selectedCharacter === 'rubble' ? 'こ' : 'にん'}</span> / {totalFireCount}{selectedCharacter === 'chase' ? 'にん' : selectedCharacter === 'rubble' ? 'こ' : 'にん'}
             </span>
           </div>
 
@@ -2536,6 +2709,70 @@ export default function GameArea() {
           </motion.div>
         </div>
       )}
+
+      {/* Rubble Debris Clear interactive overlay panel (full-screen global overlay) */}
+      <AnimatePresence>
+        {gameState === 'playing' && selectedCharacter === 'rubble' && activeRubbleTarget && (
+          <RubbleDebrisClearPanel
+            target={activeRubbleTarget}
+            soundEnabled={soundEnabled}
+            onComplete={() => handleRubbleTargetCleared(activeRubbleTarget.id)}
+            onClose={() => {
+              sound.playClick();
+              setActiveRubbleTarget(null);
+              setTargetFireId(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Marshall Fire Fight interactive overlay panel (full-screen global overlay) */}
+      <AnimatePresence>
+        {gameState === 'playing' && selectedCharacter === 'marshall' && activeMarshallTarget && (
+          <MarshallFireFightPanel
+            target={activeMarshallTarget}
+            soundEnabled={soundEnabled}
+            onComplete={() => handleMarshallTargetCleared(activeMarshallTarget.id)}
+            onClose={() => {
+              sound.playClick();
+              setActiveMarshallTarget(null);
+              setTargetFireId(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Chase Traffic Control interactive overlay panel (full-screen global overlay) */}
+      <AnimatePresence>
+        {gameState === 'playing' && selectedCharacter === 'chase' && activeChaseTarget && (
+          <ChaseTrafficControlPanel
+            target={activeChaseTarget}
+            soundEnabled={soundEnabled}
+            onComplete={() => handleChaseTargetCleared(activeChaseTarget.id)}
+            onClose={() => {
+              sound.playClick();
+              setActiveChaseTarget(null);
+              setTargetFireId(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Skye Rescue interactive overlay panel (full-screen global overlay) */}
+      <AnimatePresence>
+        {gameState === 'playing' && selectedCharacter === 'skye' && activeSkyeTarget && (
+          <SkyeRescuePanel
+            target={activeSkyeTarget}
+            soundEnabled={soundEnabled}
+            onComplete={() => handleSkyeTargetCleared(activeSkyeTarget.id)}
+            onClose={() => {
+              sound.playClick();
+              setActiveSkyeTarget(null);
+              setTargetFireId(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

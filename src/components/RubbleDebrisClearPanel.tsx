@@ -3,6 +3,128 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, Trophy, Trash2, CheckCircle2, RotateCcw, HelpCircle, ArrowRight, X } from 'lucide-react';
 import { Fire } from '../types';
 
+interface MiniGameBackgroundProps {
+  type: string;
+}
+
+function MiniGameBackground({ type }: MiniGameBackgroundProps) {
+  // Determine scene based on target type
+  let skyBg = "from-sky-300 via-cyan-100 to-sky-100";
+  let landElement = null;
+  let extraIllustrations = null;
+  
+  if (type === 'house' || type === 'shop' || type === 'car' || type === 'trash' || type === 'lost_keys' || type === 'blocked_tunnel') {
+    // 🏘️ Town Street Scene
+    skyBg = "from-sky-400 to-indigo-100";
+    landElement = (
+      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-slate-400 to-slate-300 flex flex-col justify-end">
+        {/* Street lanes lines */}
+        <div className="w-full h-1 border-t border-dashed border-white/50 mb-2.5" />
+        <div className="w-full h-1 border-t border-dashed border-white/50" />
+      </div>
+    );
+    extraIllustrations = (
+      <>
+        {/* Silhouettes of town buildings */}
+        <div className="absolute bottom-1/2 left-4 w-12 h-16 bg-indigo-200/50 rounded-t-lg border-t border-x border-indigo-300/30 z-0" />
+        <div className="absolute bottom-1/2 left-20 w-16 h-24 bg-purple-200/40 rounded-t-lg border-t border-x border-purple-300/20 z-0" />
+        <div className="absolute bottom-1/2 right-6 w-14 h-20 bg-blue-200/40 rounded-t-lg border-t border-x border-blue-300/20 z-0" />
+        {/* Clouds */}
+        <motion.div 
+          animate={{ x: [-40, 480], opacity: [0, 0.9, 0.9, 0] }}
+          transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
+          className="absolute top-2 left-0 text-lg pointer-events-none z-0"
+        >
+          ☁️
+        </motion.div>
+        <motion.div 
+          animate={{ x: [480, -40], opacity: [0, 0.8, 0.8, 0] }}
+          transition={{ repeat: Infinity, duration: 32, ease: "linear" }}
+          className="absolute top-6 right-0 text-md pointer-events-none z-0"
+        >
+          ☁️
+        </motion.div>
+        {/* Sun */}
+        <div className="absolute top-2 left-6 text-xl animate-spin z-0" style={{ animationDuration: '60s' }}>☀️</div>
+      </>
+    );
+  } else if (type === 'tree' || type === 'lost_kitten' || type === 'injured_boy' || type === 'lost_girl' || type === 'puppy_tree' || type === 'collapsed_tree' || type === 'tree_rescue' || type === 'heavy_rock' || type === 'debris') {
+    // 🌳 Forest Park Scene
+    skyBg = "from-teal-300 via-sky-100 to-emerald-50";
+    landElement = (
+      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-emerald-600 to-emerald-500 rounded-t-[80px] -mx-6 scale-x-110 z-0" />
+    );
+    extraIllustrations = (
+      <>
+        {/* Cute trees in background */}
+        <div className="absolute bottom-[40%] left-6 text-2xl select-none z-0">🌲</div>
+        <div className="absolute bottom-[38%] left-14 text-xl select-none opacity-80 z-0">🌳</div>
+        <div className="absolute bottom-[42%] right-10 text-3xl select-none z-0">🌲</div>
+        <div className="absolute bottom-[36%] right-3 text-xl select-none opacity-90 z-0">🌳</div>
+        {/* Cute mountains further back */}
+        <div className="absolute bottom-1/2 left-1/3 text-3xl opacity-40 select-none z-0">⛰️</div>
+        <div className="absolute bottom-1/2 right-1/3 text-4xl opacity-30 select-none z-0">⛰️</div>
+        {/* Cute flowers & birds */}
+        <div className="absolute bottom-3 left-10 text-xs select-none z-10">🌸</div>
+        <div className="absolute bottom-5 right-16 text-xs select-none animate-bounce z-10">🌷</div>
+        {/* Sun */}
+        <div className="absolute top-3 right-10 text-xl animate-pulse z-0">☀️</div>
+      </>
+    );
+  } else {
+    // 🏔️ High Altitude Cliff / Air Sky Scene
+    skyBg = "from-sky-400 via-cyan-200 to-amber-100";
+    landElement = (
+      <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-amber-800 to-amber-700 flex justify-between px-4 z-0">
+        <div className="w-12 h-full bg-amber-900 rounded-t-lg -mt-3 shadow z-0" />
+        <div className="w-16 h-full bg-amber-900 rounded-t-lg -mt-5 shadow z-0" />
+      </div>
+    );
+    extraIllustrations = (
+      <>
+        {/* High clouds */}
+        <motion.div 
+          animate={{ x: [-40, 480], y: [0, -2, 0] }}
+          transition={{ repeat: Infinity, duration: 18, ease: "linear" }}
+          className="absolute top-2 left-0 text-xl opacity-75 z-0"
+        >
+          ☁️
+        </motion.div>
+        <motion.div 
+          animate={{ x: [480, -40], y: [0, 3, 0] }}
+          transition={{ repeat: Infinity, duration: 22, ease: "linear" }}
+          className="absolute top-6 right-0 text-2xl opacity-60 z-0"
+        >
+          ☁️
+        </motion.div>
+        {/* Birds or balloon */}
+        <motion.div 
+          animate={{ y: [0, -6, 0], rotate: [-2, 2, -2] }}
+          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+          className="absolute top-8 left-[30%] text-lg z-0"
+        >
+          🎈
+        </motion.div>
+        <motion.div 
+          animate={{ x: [-10, 480] }}
+          transition={{ repeat: Infinity, duration: 15 }}
+          className="absolute top-4 right-20 text-xs opacity-80 z-0 pointer-events-none"
+        >
+          🦅
+        </motion.div>
+      </>
+    );
+  }
+
+  return (
+    <div className={`absolute inset-0 bg-gradient-to-b ${skyBg} overflow-hidden pointer-events-none select-none z-0`}>
+      <div className="absolute inset-0 bg-white/10 mix-blend-overlay" />
+      {extraIllustrations}
+      {landElement}
+    </div>
+  );
+}
+
 interface RubbleDebrisClearPanelProps {
   target: Fire;
   soundEnabled: boolean;
@@ -23,6 +145,7 @@ interface DebrisPiece {
 
 export default function RubbleDebrisClearPanel({ target, soundEnabled, onComplete, onClose }: RubbleDebrisClearPanelProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const playgroundRef = useRef<HTMLDivElement | null>(null);
   const [pieces, setPieces] = useState<DebrisPiece[]>([]);
   const [successCount, setSuccessCount] = useState(0);
   const [showVictory, setShowVictory] = useState(false);
@@ -52,7 +175,7 @@ export default function RubbleDebrisClearPanel({ target, soundEnabled, onComplet
   // Generate dust particle puff on active drag
   const handleDrag = (event: any, info: any, id: string) => {
     if (Math.random() < 0.45) {
-      const rect = containerRef.current?.getBoundingClientRect();
+      const rect = playgroundRef.current?.getBoundingClientRect();
       if (rect) {
         const x = info.point.x - rect.left;
         const y = info.point.y - rect.top;
@@ -92,11 +215,11 @@ export default function RubbleDebrisClearPanel({ target, soundEnabled, onComplet
       girder: 'こわれた鉄骨 (Steel Beam)'
     };
 
-    // Scatter them on the left half of the road (X: 15% to 45%, Y: 30% to 75%)
+    // Scatter them on the left half of the road (X: 12% to 48%, Y: 25% to 75%)
     const items: DebrisPiece[] = Array.from({ length: 4 }).map((_, i) => {
       const type = types[i % types.length];
-      const startX = 15 + i * 8 + Math.random() * 5;
-      const startY = 32 + i * 11 + Math.random() * 6;
+      const startX = 12 + i * 9 + Math.random() * 4;
+      const startY = 25 + i * 13 + Math.random() * 5;
       const angle = (Math.random() - 0.5) * 40; // slant angle
       const scale = 0.95 + Math.random() * 0.2;
 
@@ -378,7 +501,7 @@ export default function RubbleDebrisClearPanel({ target, soundEnabled, onComplet
   return (
     <div 
       id="rubble-challenge-overlay"
-      className="absolute inset-0 bg-slate-900/85 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 z-40 font-sans text-white select-none"
+      className="fixed inset-0 bg-slate-900/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 z-[100] font-sans text-white select-none animate-fade-in"
     >
       <motion.div 
         initial={{ scale: 0.9, opacity: 0 }}
@@ -390,18 +513,18 @@ export default function RubbleDebrisClearPanel({ target, soundEnabled, onComplet
         } : { scale: 1, opacity: 1 }}
         transition={{ duration: 0.55, ease: "easeInOut" }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="relative w-full max-w-2xl bg-gradient-to-b from-amber-50 to-orange-100 rounded-3xl border-6 border-amber-400 shadow-2xl text-slate-800 flex flex-col overflow-hidden max-h-[92vh] sm:max-h-none h-full sm:h-auto"
+        className="relative w-full max-w-xl bg-gradient-to-b from-amber-50 to-orange-100 rounded-3xl border-6 border-amber-400 shadow-2xl text-slate-800 flex flex-col overflow-hidden max-h-[94vh] h-auto"
       >
         {/* Warning hazard yellow striped borders */}
         <div 
-          className="h-3 w-full flex" 
+          className="h-3 w-full flex-shrink-0 flex" 
           style={{
             background: 'repeating-linear-gradient(45deg, #facc15, #facc15 12px, #1e293b 12px, #1e293b 24px)'
           }}
         />
 
         {/* Header bar */}
-        <div className="bg-amber-400 p-2.5 sm:p-4 text-center border-b-3 border-amber-500 shadow-md flex items-center justify-between">
+        <div className="bg-amber-400 p-2.5 sm:p-4 text-center border-b-3 border-amber-500 shadow-md flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-1.5 sm:gap-2.5 text-slate-900">
             <span className="text-xl sm:text-2xl animate-bounce">🚧</span>
             <div className="text-left">
@@ -426,7 +549,7 @@ export default function RubbleDebrisClearPanel({ target, soundEnabled, onComplet
         {/* Playfield body */}
         <div 
           ref={containerRef}
-          className="relative flex-grow flex flex-col justify-between p-3 sm:p-5 min-h-[220px] sm:min-h-[280px]"
+          className="relative flex-grow flex flex-col justify-between p-2.5 sm:p-5 min-h-0 sm:min-h-[250px]"
         >
           {/* Instructions banner */}
           <div className="bg-amber-200/90 border border-amber-300 p-1.5 sm:p-2.5 rounded-xl shadow-xs text-center flex items-center justify-center gap-1.5 sm:gap-2 mb-2">
@@ -441,7 +564,12 @@ export default function RubbleDebrisClearPanel({ target, soundEnabled, onComplet
           </div>
 
           {/* Core drag playground row */}
-          <div className="flex-grow relative flex items-stretch bg-sky-100/60 rounded-2xl border-2 border-dashed border-sky-300 overflow-hidden min-h-[160px] sm:min-h-[200px]">
+          <div 
+            ref={playgroundRef}
+            className="flex-grow relative flex items-stretch rounded-2xl border-2 border-dashed border-sky-300 overflow-hidden min-h-[160px] sm:min-h-[200px]"
+          >
+            {/* Dynamic cartoon background illustration */}
+            <MiniGameBackground type={target.type} />
             {/* Soil / Mud / Stone Dust particles generated dynamically during digging */}
             {dustParticles.map((dp) => (
               <motion.div
@@ -472,64 +600,62 @@ export default function RubbleDebrisClearPanel({ target, soundEnabled, onComplet
             {/* Ground road lane indicator */}
             <div className="absolute bottom-4 inset-x-0 h-10 bg-slate-300/40 border-y border-slate-300/60 pointer-events-none" />
 
-            {/* LEFT SIDE: Scattered debris pieces */}
-            <div className="absolute inset-y-0 left-0 w-[55%] pointer-events-none">
-              {pieces.map((p) => {
-                if (p.cleared) return null;
-                const isActive = activeDragId === p.id;
-                return (
-                  <motion.div
-                    key={p.id}
-                    id={`drag-item-${p.id}`}
-                    drag
-                    dragConstraints={containerRef}
-                    dragElastic={0.15}
-                    onDragStart={() => handleDragStart(p.id)}
-                    onDrag={(e, info) => handleDrag(e, info, p.id)}
-                    onDragEnd={(e, info) => handleDragEnd(e, info, p.id)}
-                    style={{
-                      left: `${p.startX}%`,
-                      top: `${p.startY}%`,
-                      zIndex: isActive ? 50 : 20,
-                      touchAction: 'none'
-                    }}
-                    className="absolute -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing pointer-events-auto flex flex-col items-center justify-center"
-                  >
-                    {/* Visual shovel attachment above or around the rock when being actively dragged */}
-                    {isActive && (
-                      <motion.div
-                        initial={{ y: -45, scale: 0.8, opacity: 0 }}
-                        animate={{ y: -30, scale: 1.05, opacity: 1 }}
-                        className="absolute flex flex-col items-center pointer-events-none z-30"
-                      >
-                        {/* Shovel hook line */}
-                        <div className="w-1.5 h-12 bg-amber-400 border-x border-amber-600" />
-                        {/* Shovel scoop/grabber bucket icon */}
-                        <div className="bg-amber-400 p-1 rounded-lg border-2 border-slate-800 shadow-md flex items-center justify-center w-9 h-7 -mt-1.5">
-                          <svg viewBox="0 0 40 40" className="w-6 h-6">
-                            <path d="M 5 25 Q 20 40 35 25 Q 35 10 20 10 Q 5 10 5 25 Z" fill="#eab308" stroke="#1e293b" strokeWidth="2" />
-                            <circle cx="20" cy="18" r="3" fill="#475569" />
-                            <path d="M 12 25 L 16 32 M 28 25 L 24 32" stroke="#1e293b" strokeWidth="2" />
-                          </svg>
-                        </div>
-                        <span className="text-[8px] bg-red-600 text-white font-black px-1.5 rounded-md border border-white -mt-1 scale-90 whitespace-nowrap">がっちりキャッチ！</span>
-                      </motion.div>
-                    )}
-
+            {/* Scattered debris pieces */}
+            {pieces.map((p) => {
+              if (p.cleared) return null;
+              const isActive = activeDragId === p.id;
+              return (
+                <motion.div
+                  key={p.id}
+                  id={`drag-item-${p.id}`}
+                  drag
+                  dragConstraints={playgroundRef}
+                  dragElastic={0.15}
+                  onDragStart={() => handleDragStart(p.id)}
+                  onDrag={(e, info) => handleDrag(e, info, p.id)}
+                  onDragEnd={(e, info) => handleDragEnd(e, info, p.id)}
+                  style={{
+                    left: `${p.startX}%`,
+                    top: `${p.startY}%`,
+                    zIndex: isActive ? 50 : 20,
+                    touchAction: 'none'
+                  }}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing pointer-events-auto flex flex-col items-center justify-center"
+                >
+                  {/* Visual shovel attachment above or around the rock when being actively dragged */}
+                  {isActive && (
                     <motion.div
-                      animate={{
-                        scale: isActive ? p.scale * 1.15 : p.scale,
-                        rotate: isActive ? p.angle + 8 : p.angle,
-                        boxShadow: isActive ? '0px 12px 20px rgba(0,0,0,0.25)' : '0px 4px 6px rgba(0,0,0,0.1)'
-                      }}
-                      className="p-1.5 rounded-full transition-shadow duration-100"
+                      initial={{ y: -45, scale: 0.8, opacity: 0 }}
+                      animate={{ y: -30, scale: 1.05, opacity: 1 }}
+                      className="absolute flex flex-col items-center pointer-events-none z-30"
                     >
-                      {renderDebrisGraphics(p.type, false)}
+                      {/* Shovel hook line */}
+                      <div className="w-1.5 h-12 bg-amber-400 border-x border-amber-600" />
+                      {/* Shovel scoop/grabber bucket icon */}
+                      <div className="bg-amber-400 p-1 rounded-lg border-2 border-slate-800 shadow-md flex items-center justify-center w-9 h-7 -mt-1.5">
+                        <svg viewBox="0 0 40 40" className="w-6 h-6">
+                          <path d="M 5 25 Q 20 40 35 25 Q 35 10 20 10 Q 5 10 5 25 Z" fill="#eab308" stroke="#1e293b" strokeWidth="2" />
+                          <circle cx="20" cy="18" r="3" fill="#475569" />
+                          <path d="M 12 25 L 16 32 M 28 25 L 24 32" stroke="#1e293b" strokeWidth="2" />
+                        </svg>
+                      </div>
+                      <span className="text-[8px] bg-red-600 text-white font-black px-1.5 rounded-md border border-white -mt-1 scale-90 whitespace-nowrap">がっちりキャッチ！</span>
                     </motion.div>
+                  )}
+
+                  <motion.div
+                    animate={{
+                      scale: isActive ? p.scale * 1.15 : p.scale,
+                      rotate: isActive ? p.angle + 8 : p.angle,
+                      boxShadow: isActive ? '0px 12px 20px rgba(0,0,0,0.25)' : '0px 4px 6px rgba(0,0,0,0.1)'
+                    }}
+                    className="p-1.5 rounded-full transition-shadow duration-100"
+                  >
+                    {renderDebrisGraphics(p.type, false)}
                   </motion.div>
-                );
-              })}
-            </div>
+                </motion.div>
+              );
+            })}
 
             {/* RIGHT SIDE: Rubble's Dump Truck / Collector hopper */}
             <div 
